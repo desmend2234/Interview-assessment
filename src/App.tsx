@@ -1,10 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './pages/MainPage';
+import PostDetailsPage from './pages/PostDetails';
+
 function App() {
   return (
-    <>
-      <div className='flex flex-col items-center justify-center h-screen'>
-        <h1 className='text-4xl font-bold'>Interview assessment</h1>
-      </div>
-    </>
+    <Router>
+      <Routes>
+        <Route path='/' element={<MainPage />} />
+        <Route path='/post/:id' element={<PostDetailsPage />} />
+      </Routes>
+    </Router>
   );
 }
 
