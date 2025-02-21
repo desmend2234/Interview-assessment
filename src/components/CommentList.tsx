@@ -27,16 +27,15 @@ function CommentList({
           className='p-5 border rounded-lg bg-gray-50 hover:bg-gray-100 transition'
         >
           <div className='flex flex-col md:flex-row md:items-start gap-5'>
-            <div className='text-gray-500 md:w-[60px] shrink-0'>
-              <span className='text-sm'>#{comment.id}</span>
-            </div>
             <div className='flex-1 space-y-3'>
               <div className='flex items-center gap-2 text-gray-500'>
-                <span className='font-medium text-gray-700'>
+                <span className='font-bold text-gray-700'>
+                  <span className='text-sm font-semibold'>Name:</span>{' '}
                   {comment.name}
                 </span>
               </div>
               <p className='text-gray-600 break-words leading-relaxed'>
+                <span className='text-sm font-semibold'>Content:</span>{' '}
                 {comment.body}
               </p>
             </div>

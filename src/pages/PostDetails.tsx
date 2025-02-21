@@ -50,6 +50,7 @@ function PostDetails() {
         axios.get(`https://jsonplaceholder.typicode.com/users/${id}`),
       ]);
       console.log(postRes.data);
+
       // 將文章資料和作者資料合併
       setPost({
         ...postRes.data,
@@ -68,6 +69,7 @@ function PostDetails() {
       `https://jsonplaceholder.typicode.com/posts/${id}/comments`
     );
     // 為每條評論添加模擬的 userId，用於控制刪除權限
+    console.log(res.data);
     const commentsWithUsers = res.data.map(
       (comment: Comment, index: number) => ({
         ...comment,
