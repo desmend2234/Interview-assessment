@@ -73,10 +73,17 @@ function MainPage() {
             disabled={isLoading}
             size='small'
             sx={{
-              width: { xs: '100%', sm: '120px' },
+              width: { xs: '120px', sm: '120px' },
+              position: 'relative',
+              top: { xs: '0', sm: '24px' },
+              left: { xs: '0', sm: '20px' },
+              margin: { xs: '0 auto', sm: '0' },
+              '&:hover': {
+                left: { xs: '0', sm: '26px' },
+              },
             }}
           >
-            {isLoading ? 'Updating...' : 'Update'}
+            {isLoading ? 'Loading' : 'Update'}
           </Button>
         </div>
 
