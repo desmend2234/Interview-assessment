@@ -40,47 +40,48 @@ function PostDetails() {
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  // 同時獲取文章內容和作者資訊
-  async function getPost() {
-    try {
-      const [postRes, userRes] = await Promise.all([
-        axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
-        axios.get(`https://jsonplaceholder.typicode.com/users/${id}`),
-      ]);
-
-      if (!postRes.data || !userRes.data) {
-        navigate('/404'); // 資料不存在時導向 404
-        return;
+  // 初始化時獲取文章和評論資料
+  useEffect(() => {
+    async function getPost() {
+      try {
+        const postRes = await axios.get(
+          `https://jsonplaceholder.typicode.com/posts/${id}`
+        );
+        const userRes = await axios.get(
+          `https://jsonplaceholder.typicode.com/users/${postRes.data.userId}`
+        );
+        setPost({
+          ...postRes.data,
+          user: {
+            name: userRes.data.name,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+        navigate('/404');
+      } finally {
+        setIsLoading(false);
       }
-
-      setPost({
-        ...postRes.data,
-        user: {
-          name: userRes.data.name,
-        },
-      });
-    } catch (err) {
-      console.error('Failed to fetch post:', err);
-      setIsLoading(false); // 錯誤時設置 loading 為 false
     }
-  }
 
-  // 獲取文章的評論列表
-  async function getComments() {
-    const res = await axios.get(
-      `https://jsonplaceholder.typicode.com/posts/${id}/comments`
-    );
-    // 為每條評論添加模擬的 userId，用於控制刪除權限
-    console.log(res.data);
-    const commentsWithUsers = res.data.map(
-      (comment: Comment, index: number) => ({
-        ...comment,
-        userId: index,
-      })
-    );
-    setComments(commentsWithUsers);
-  }
+    async function getComments() {
+      const res = await axios.get(
+        `https://jsonplaceholder.typicode.com/posts/${id}/comments`
+      );
+      const commentsWithUsers = res.data.map(
+        (comment: Comment, index: number) => ({
+          ...comment,
+          userId: index + 1, // 因為 userId 從 1 開始
+        })
+      );
+      setComments(commentsWithUsers);
+    }
+
+    getPost();
+    getComments();
+  }, [id, navigate]);
 
   // 刪除評論的處理函數
   async function handleDeleteComment() {
@@ -108,11 +109,11 @@ function PostDetails() {
     setDeleteDialogOpen(true);
   }
 
-  // 初始化時獲取文章和評論資料
-  useEffect(() => {
-    getPost();
-    getComments();
-  }, []);
+  // 處理返回列表
+  const handleBackToList = async () => {
+    setIsNavigating(true); // 開始導航
+    navigate('/'); // 返回列表
+  };
 
   if (isLoading) {
     return (
@@ -135,21 +136,25 @@ function PostDetails() {
             {post.title}
           </h1>
           <div className='flex items-center text-sm md:text-base text-gray-600'>
-            <span className='font-medium'>Author：{post.user?.name}</span>
+            <span className='font-medium'>
+              <span className='font-semibold'>Name:</span> {post.user?.name}
+            </span>
           </div>
           <p className='text-sm md:text-base text-gray-600 break-words'>
-            {post.body}
+            <span className='font-semibold'>Content:</span> {post.body}
           </p>
         </div>
 
         <div className='my-6'>
           <Button
             variant='outlined'
-            onClick={() => navigate('/')}
+            onClick={handleBackToList}
             fullWidth
             className='md:w-auto'
+            disabled={isNavigating}
+            startIcon={isNavigating ? <CircularProgress size={20} /> : null}
           >
-            Back to list
+            {isNavigating ? 'Loading...' : 'Back to list'}
           </Button>
         </div>
 
@@ -162,6 +167,7 @@ function PostDetails() {
           />
         </div>
 
+        {/* 刪除評論的對話框 */}
         <Dialog
           open={deleteDialogOpen}
           onClose={() => setDeleteDialogOpen(false)}

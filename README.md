@@ -17,9 +17,11 @@ npm install
 ```
 
 3. Set up environment variables
-   Create a `.env` file in the root directory with:
+   Copy `.env.example` to `.env` and modify if needed:
 
 ```bash
+cp .env.example .env
+# Then edit .env if you need to change any values
 VITE_USER_ID=1
 ```
 
