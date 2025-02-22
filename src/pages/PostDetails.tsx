@@ -44,22 +44,25 @@ function PostDetails() {
   // 同時獲取文章內容和作者資訊
   async function getPost() {
     try {
-      // 使用 Promise.all 同時發送兩個 API 請求，等待兩個請求都完成後，將資料合併
       const [postRes, userRes] = await Promise.all([
         axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`),
         axios.get(`https://jsonplaceholder.typicode.com/users/${id}`),
       ]);
-      console.log(postRes.data);
 
-      // 將文章資料和作者資料合併
+      if (!postRes.data || !userRes.data) {
+        navigate('/404'); // 資料不存在時導向 404
+        return;
+      }
+
       setPost({
         ...postRes.data,
         user: {
           name: userRes.data.name,
         },
       });
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch post:', err);
+      setIsLoading(false); // 錯誤時設置 loading 為 false
     }
   }
 
@@ -119,7 +122,10 @@ function PostDetails() {
     );
   }
 
-  if (!post) return <div>Post not found</div>;
+  if (!post) {
+    navigate('/404');
+    return null;
+  }
 
   return (
     <div className='min-h-screen bg-gray-50'>
